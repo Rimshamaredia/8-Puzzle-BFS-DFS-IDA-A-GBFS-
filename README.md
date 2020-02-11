@@ -3,8 +3,8 @@ This is a Java implementation for the popular 8-puzzle problem using many search
 1) DFS (Depth First Search)
 2) BFS (Breadth First Search)
 3) Iterative Deepening
-4) Uniform Cost
-5) BFS(Best First Search)
-6) A*
+4) Greedy BFS(Greedy Best First Search)
+5) A*
 # How to run:
-You need to run the App.java class. It contains the main method. In this class, you have the ability to define your initial state. You can also define the goal state. So, it is a very comprehensive solution. 
+You need to run the main.java class. It contains the main method. 
+You can choose initial and goal state in this function
