@@ -1,7 +1,11 @@
+/* 
+Created by Rimsha Maredia
+*/
+
 import java.util.*;
 
 
-public class SearchTree {
+public class Search {
     private Node root;
     private String goalSate;
 
@@ -21,12 +25,12 @@ public class SearchTree {
         this.goalSate = goalSate;
     }
 
-    public SearchTree(Node root, String goalSate) {
+    public Search(Node root, String goalSate) {
         this.root = root;
         this.goalSate = goalSate;
     }
 
-
+//cost by counting the number of misplaced tiles
     private int heuristicOne(String currentState, String goalSate) {
         int difference = 0;
         for (int i = 0; i < currentState.length(); i += 1)
@@ -45,16 +49,17 @@ public class SearchTree {
         return difference;
     }
     public void BFS() {
-        // stateSet is a set that contains node that are already visited
+        // stateSet stores visited nodes
         Set<String> stateSets = new HashSet<String>();
         int totalCost = 0;
         int time = 0;
         Node node = new Node(root.getState());
+
         Queue<Node> queue = new LinkedList<Node>();
         Node currentNode = node;
         while (!currentNode.getState().equals(goalSate)) {
             stateSets.add(currentNode.getState());
-            List<String> nodeSuccessors = NodeUtil.getSuccessors(currentNode.getState());
+            List<String> nodeSuccessors = Utility.getnext(currentNode.getState());
             for (String n : nodeSuccessors) {
                 if (stateSets.contains(n))
                     continue;
@@ -69,25 +74,25 @@ public class SearchTree {
             time += 1;
         }
 
-        NodeUtil.printSolution(currentNode, stateSets, root, time);
+        Utility.print(currentNode, stateSets, root, time);
 
     }
-//**********************************************************************************************
+
 
     public void DFS() {
-        // stateSet is a set that contains node that are already visited
+       
         Set<String> stateSets = new HashSet<String>();
         int totalCost = 0;
         int time = 0;
         Node node = new Node(root.getState());
-        //the queue that store nodes that we should expand
-        MyQueue<Node> mainQueue = new MyQueue<>();
-        //the queue that contains the successors of the expanded node
-        MyQueue<Node> temp = new MyQueue<>();
+       
+        MyQueue<Node> mainQueue = new MyQueue<>(); //queue to store nodes to expand
+       
+        MyQueue<Node> temp = new MyQueue<>(); //temp queue to transfer nodes to mainqueue to work as a stack
         Node currentNode = node;
         while (!currentNode.getState().equals(goalSate)) {
             stateSets.add(currentNode.getState());
-            List<String> nodeSuccessors = NodeUtil.getSuccessors(currentNode.getState());
+            List<String> nodeSuccessors = Utility.getnext(currentNode.getState());
             for (String n : nodeSuccessors) {
                 if (stateSets.contains(n))
                     continue;
@@ -98,35 +103,35 @@ public class SearchTree {
                 temp.enqueue(child);
 
             }
-            //we add the queue that contains the successors of the visted node to the beginning of the main queue
+           
             mainQueue.addQueue(temp);
-            //successors queue should be cleared in order to store the next expaneded's successors
+           
             temp.clear();
             currentNode = mainQueue.dequeue();
             time += 1;
             nodeSuccessors.clear();
         }
-        NodeUtil.printSolution(currentNode, stateSets, root, time);
+        Utility.print(currentNode, stateSets, root, time);
 
     }
     
     public void Greedy_BestFirst() {
-        // stateSet is a set that contains node that are already visited
+       
         Set<String> stateSets = new HashSet<String>();
         int totalCost = 0;
         int time = 0;
         Node node = new Node(root.getState());
         node.setCost(0);
 
-        // the comparator compare the cost values and make the priority queue to be sorted based on cost values
+       //comparing the cost and sort based on the cost
         NodePriorityComparator nodePriorityComparator = new NodePriorityComparator();
 
-        // a queue that contains nodes and their cost values sorted. 10 is the initial size
+       
         PriorityQueue<Node> nodePriorityQueue = new PriorityQueue<Node>(10, nodePriorityComparator);
         Node currentNode = node;
         while (!currentNode.getState().equals(goalSate)) {
             stateSets.add(currentNode.getState());
-            List<String> nodeSuccessors = NodeUtil.getSuccessors(currentNode.getState());
+            List<String> nodeSuccessors = Utility.getnext(currentNode.getState());
             for (String n : nodeSuccessors) {
                 if (stateSets.contains(n))
                     continue;
@@ -134,7 +139,7 @@ public class SearchTree {
                 Node child = new Node(n);
                 currentNode.addChild(child);
                 child.setParent(currentNode);
-
+               //counting the number of misplaced tiles
                 child.setTotalCost(0, heuristicOne(child.getState(), goalSate));
                 nodePriorityQueue.add(child);
 
@@ -142,30 +147,31 @@ public class SearchTree {
             currentNode = nodePriorityQueue.poll();
             time += 1;
         }
-        // Here we try to navigate from the goal node to its parent( and its parent's parent and so on) to find the path
+       
         NodeUtil.printSolution(currentNode, stateSets, root, time);
 
     }
+    
+    
 
 
    
-    public void AStar() {
-        // stateSet is a set that contains node that are already visited
+    public void AS() {
         Set<String> stateSets = new HashSet<String>();
         int totalCost = 0;
         int time = 0;
         Node node = new Node(root.getState());
-        node.setTotalCost(0);
+        node.setCost(0);
 
-        // the comparator compare the cost values and make the priority queue to be sorted based on cost values
+       
         NodePriorityComparator nodePriorityComparator = new NodePriorityComparator();
 
-        // a queue that contains nodes and their cost values sorted. 10 is the initial size
+       
         PriorityQueue<Node> nodePriorityQueue = new PriorityQueue<Node>(10, nodePriorityComparator);
         Node currentNode = node;
         while (!currentNode.getState().equals(goalSate)) {
             stateSets.add(currentNode.getState());
-            List<String> nodeSuccessors = NodeUtil.getSuccessors(currentNode.getState());
+            List<String> nodeSuccessors = Utility.getnext(currentNode.getState());
             for (String n : nodeSuccessors) {
                 if (stateSets.contains(n))
                     continue;
@@ -174,13 +180,17 @@ public class SearchTree {
                 currentNode.addChild(child);
                 child.setParent(currentNode);
 
-                    child.setTotalCost(currentNode.getTotalCost() + Character.getNumericValue(child.getState().charAt(child.getParent().getState().indexOf('0'))), Manhathan_Distance(child.getState(), goalSate));
-              
+                //using manhattan distance to calculate the cost and sort accordingly
+                child.setTotalCost(currentNode.getTotalCost() + Character.getNumericValue(child.getState().charAt(child.getParent().getState().indexOf('0'))), Manhathan_Distance(child.getState(), goalSate));
+                nodePriorityQueue.add(child);
+
             }
             currentNode = nodePriorityQueue.poll();
             time += 1;
         }
-        NodeUtil.printSolution(currentNode, stateSets, root, time);
+       
+        Utility.print(currentNode, stateSets, root, time);
+
     }
 
 
@@ -193,12 +203,12 @@ public class SearchTree {
         Set<String> totalVisitedStates = new HashSet<>();
         int time = 0;
         for (int maxDepth = 1; maxDepth < depthLimit; maxDepth++) {
-            //we should clear the visited list in each iteration
-            stateSets.clear();
-            //the queue that store nodes that we should expand
-            MyQueue<Node> mainQueue = new MyQueue<>();
-            //the queue that stores the successors of the expanded node
-            MyQueue<Node> successorsQueue = new MyQueue<>();
+           
+            stateSets.clear();//clears the visited nodes
+          
+            MyQueue<Node> mainQueue = new MyQueue<>(); //stores the next expanded node
+           
+            MyQueue<Node> temp = new MyQueue<>();
             Node node = new Node(root.getState());
             mainQueue.enqueue(node);
             currentNode = node;
@@ -206,13 +216,13 @@ public class SearchTree {
             stateSets.add(currentNode.getState());
             while (!mainQueue.isEmpty()) {
                 currentNode = mainQueue.dequeue();
-                time += 1;
+                
                 if (currentNode.getState().equals(goalSate)) {
                     solutionFound = true;
                     break;
                 }
                 if (currentNode.getDepth() < maxDepth) {
-                    nodeSuccessors = NodeUtil.getSuccessors(currentNode.getState());
+                    nodeSuccessors = Utility.getnext(currentNode.getState());
                     for (String n : nodeSuccessors) {
                         if (stateSets.contains(n))
                             continue;
@@ -223,14 +233,15 @@ public class SearchTree {
                         child.setParent(currentNode);
                         child.setVisited(true);
                         child.setDepth(currentNode.getDepth() + 1);
-                        successorsQueue.enqueue(child);
+                        temp.enqueue(child);
 
                     }
-                    //we add the queue that contains the successors of the visted node to the beginning of the main queue
-                    mainQueue.addQueue(successorsQueue);
-                    //successors queue should be cleared in order to store the next expaneded's successors
-                    successorsQueue.clear();
+                   
+                    mainQueue.addQueue(temp);//adding to the beginning of the main queue
+                   
+                    temp.clear();
                 }
+                time += 1;
             }
 
             if (solutionFound)
@@ -240,7 +251,7 @@ public class SearchTree {
         if (!solutionFound)
             System.out.println("No solution Found! Increase the depth value");
         else {
-            NodeUtil.printSolution(currentNode, totalVisitedStates, root, time);
+            Utility.print(currentNode, totalVisitedStates, root, time);
 
 
         }

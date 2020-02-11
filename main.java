@@ -11,16 +11,16 @@ public class main {
 
 
     public static void main(String[] args) {
-        String Initial_state = EASY;
+        String Initial_state = temp;
         long startTime = System.currentTimeMillis();
 
-        SearchTree search = new SearchTree(new Node(Initial_state), GOAL_STATE);
+        Search search = new Search(new Node(Initial_state), GOAL_STATE);
        
-        search.AStar();
+        search.Greedy_BestFirst();
 
         long finishTime = System.currentTimeMillis();
         long totalTime = finishTime - startTime;
-        System.out.println("Time  :" + totalTime);
+        System.out.println("Time  :" + totalTime+ "ms");
 
 
     }
